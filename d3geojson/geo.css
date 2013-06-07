@@ -1,0 +1,43 @@
+body {
+	font: 10px sans-serif;
+}
+
+.axis path, .axis line {
+	fill: none;
+	stroke: #000;
+	shape-rendering: crispEdges;
+}
+
+.bar, .legend {
+	fill: steelblue;
+}
+
+.x.axis path {
+	display: none;
+}
+
+.grid .tick {
+	stroke: lightgrey;
+	opacity: 0.7;
+}
+.grid path {
+	stroke-width: 0;
+}
+
+.legend-text {
+	opacity: 0.7;
+	fill: black;
+}
+
+.mean {
+	stroke: black;
+}
+
+b {
+	font-weight: bolder;
+	font-size: large;
+}
+
+.tipsy-inner {
+	text-align: left;
+}
