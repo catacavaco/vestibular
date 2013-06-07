@@ -1,36 +1,25 @@
-body {
-	font: 10px sans-serif;
+.background {
+  fill: none;
+  pointer-events: all;
 }
 
-.axis path, .axis line {
-	fill: none;
-	stroke: #000;
-	shape-rendering: crispEdges;
+#states path {
+  fill: #aaa;
+  stroke: #fff;
+  stroke-width: 1.5px;
 }
 
-.bar, .legend {
+#states path:hover {
+  stroke: white;
+}
+
+.municipio {
 	fill: steelblue;
-}
-
-.x.axis path {
-	display: none;
-}
-
-.grid .tick {
-	stroke: lightgrey;
-	opacity: 0.7;
-}
-.grid path {
-	stroke-width: 0;
 }
 
 .legend-text {
 	opacity: 0.7;
 	fill: black;
-}
-
-.mean {
-	stroke: black;
 }
 
 b {
