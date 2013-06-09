@@ -180,6 +180,7 @@ function sortElements() {
 
 
 $(window).resize(function() {
+	magnitude = "mesoregioes_mg";
 	width = $("#geografico").width();
 	height = width / 1.2;
 	scale = width * 3.5;
