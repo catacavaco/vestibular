@@ -3,13 +3,13 @@
 	pointer-events: all;
 }
 
-#states {
+#mg {
 	fill: #aaa;
 	stroke: #fff;
 	stroke-width: 0.5px;
 }
 
-#states .active {
+#mg .active {
 	fill: #6699DD;
 }
 #capital {

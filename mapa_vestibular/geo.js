@@ -18,7 +18,10 @@ svg.append("rect")
     .on("click", click);
 
 var g = svg.append("g")
-    .attr("id", "states");
+    .attr("id", "mg");
+    
+var points = svg.append("g")
+    .attr("id", "candidatos");
     
 function draw(){
 	d3.json("data.geojson", function(json) {
@@ -96,6 +99,15 @@ function draw(){
 			sortElements(); 
 	
 	});
+	
+	var projectionPoints = d3.geo.mercator().scale(scale).center(center).translate(offset);
+	var coords = projectionPoints([-43.95195, -19.91007]);
+	
+	points.append("circle")
+	.attr('cx', coords[0])
+	.attr('cy', coords[1])
+	.attr('r', 1.5)
+	.style('fill', 'red');
 }
 
 draw();
@@ -130,6 +142,11 @@ function click(d, isCapital) {
 	g.transition().duration(1000)
 		.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")scale(" + k + ")translate(" + -x + "," + -y + ")")
 		.style("stroke-width", 0.5 / k + "px");
+		
+	points.transition().duration(1000)
+		.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")scale(" + k + ")translate(" + -x + "," + -y + ")");
+	points.selectAll("circle").transition().duration(1000)
+		.attr('r', 1.5 / k);
 
 }
 
@@ -202,6 +219,7 @@ $(window).resize(function() {
 				.attr("height", height)
 				.on("click", click);
 
-	g = svg.append("g").attr("id", "states");
+	g = svg.append("g").attr("id", "mg");
+	points = svg.append("g").attr("id", "candidatos");
 	draw();
 });
