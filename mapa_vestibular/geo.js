@@ -26,10 +26,6 @@ var points = svg.append("g")
 function draw(){
 	d3.json("data.geojson", function(json) {
 		
-		json.features.forEach(function(d) {
-			d.tipo = d.tipo;
-		}); 
-		
 		g.selectAll("path").remove();
 		
 		g.selectAll("path").data(json.features).enter().append("path")
@@ -43,11 +39,10 @@ function draw(){
 			.attr("class", function(d) { return d.tipo; })
 			.attr("nome", function(d) { return d.properties.nome; })
 	        
-	        .attr("uf", function(d) { return d.properties.uf; })
-	        .attr("sigla", function(d) { return d.properties.sigla; })
-			.attr("regiao", function(d) { return d.properties.regiao; })
-			.attr("nome_meso", function(d) { return d.properties.nome_meso; })
-			.attr("pop2010", function(d) { return d.properties.pop2010; })
+	        .attr("Sigla", function(d) { return d.properties.sigla; })
+			.attr("Região", function(d) { return d.properties.regiao; })
+			.attr("Mesoregião", function(d) { return d.properties.nome_meso; })
+			.attr("População", function(d) { return d.properties.pop2010; })
 			.attr("d", path)
 			.on("click", function(d) {
 				if (d.tipo != "bairro_popular") {
@@ -82,11 +77,10 @@ function draw(){
 					var string = "<b>" + title + " </b><br/>";
 					for (var i = 0; i < this.attributes.length; i++) {
 						var attrib = this.attributes[i];
-						if (attrib.specified && attrib.name != "d" && attrib.name != "original-title" && attrib.name != "class" && attrib.name != "nome") {
-							string += "<b>" + attrib.name + "</b> <span> " + attrib.value + " </span>";
+						if (attrib.specified && attrib.name != "d" && attrib.name != "original-title" && attrib.name != "class" && attrib.name != "nome" && attrib.name != "id") {
+							string += "<b>" + attrib.name + "</b> <span> " + attrib.value + " </span><br/>";
 						}
 					}
-		
 					return string;
 				}
 			}); 

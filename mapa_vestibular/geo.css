@@ -13,7 +13,7 @@
 	fill: #6699DD;
 }
 #capital {
-	fill : #6699aa;
+	fill: #6699aa;
 }
 
 .mesoregioes_mg {
@@ -26,6 +26,14 @@
 	fill: #6699aa
 }
 
-.bairro_popular:hover,.municipios_metropolitana_bh:hover,.mesoregioes_mg:hover {
+.bairro_popular:hover, .municipios_metropolitana_bh:hover, .mesoregioes_mg:hover {
 	fill: #6699cc;
+}
+
+b {
+	font-weight: bolder;
+}
+
+.tipsy-inner {
+	text-align: left;
 }
