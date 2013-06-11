@@ -16,17 +16,17 @@
 	fill: #6699aa;
 }
 
-.mesoregioes_mg {
+.mesomg {
 	fill: #aacccc;
 }
-.municipios_metropolitana_bh {
+.munmg {
 	fill: #88aaaa;
 }
-.bairro_popular {
+.bairrobh {
 	fill: #6699aa
 }
 
-.bairro_popular:hover, .municipios_metropolitana_bh:hover, .mesoregioes_mg:hover {
+.bairrobh:hover, .munmg:hover, .mesomg:hover {
 	fill: #6699cc;
 }
 

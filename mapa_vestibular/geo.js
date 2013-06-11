@@ -1,8 +1,8 @@
-var magnitude = "mesoregioes_mg";
+var magnitude = "mesomg";
 var center = [-44.31301959952854, -18.95937600486544];
 
-var width = $("#geografico").width(), height = width / 1.2, centered;
-var scale = width * 3.5;
+var width = $("#geografico").width(), height = width / 1.5, centered;
+var scale = width * 3.3;
 var offset = [width / 2, height / 2];
 var projection = d3.geo.mercator().scale(scale).center(center).translate(offset);
 var path = d3.geo.path().projection(projection);
@@ -24,7 +24,7 @@ var points = svg.append("g")
     .attr("id", "candidatos");
     
 function draw(){
-	d3.json("data.geojson", function(json) {
+	d3.json("minas.geojson", function(json) {
 		
 		g.selectAll("path").remove();
 		
@@ -45,22 +45,18 @@ function draw(){
 			.attr("População", function(d) { return d.properties.pop2010; })
 			.attr("d", path)
 			.on("click", function(d) {
-				if (d.tipo != "bairro_popular") {
+				if (d.tipo != "bairrobh") {
 					// MESO
-					if (d.tipo == "mesoregioes_mg") {
-						if (d.properties.nome == 'Metropolitana de Belo Horizonte') {
-							magnitude = "municipios_metropolitana_bh";
-						} else {
-							magnitude = "mesoregioes_mg";
-						}
-							click(d, false);
+					if (d.tipo == "mesomg") {
+						magnitude = "munmg";
+						click(d, false);
 					// MUNICIPIOS
-					} else if (d.tipo == "municipios_metropolitana_bh") {
+					} else if (d.tipo == "munmg") {
 						if (d.properties.nome == 'Belo Horizonte') {
-							magnitude = "bairro_popular";
+							magnitude = "bairrobh";
 							click(d, true);
 						} else {
-							magnitude = "municipios_metropolitana_bh";
+							magnitude = "munmg";
 							click(d, false);
 						}
 					}
@@ -85,7 +81,7 @@ function draw(){
 				}
 			}); 
 		
-			$("#mesoregioes_mg, #municipios_metropolitana_bh, #bairro_popular").click(function() {
+			$("#mesomg, #munmg, #bairrobh").click(function() {
 				magnitude = this.id;
 				sortElements();
 			});
@@ -115,16 +111,16 @@ function click(d, isCapital) {
 		y = centroid[1];
 		centered = d;
 		if (isCapital) {
-			k = 33;
+			k = 32;
 		} else {
-			k = 4;
+			k = 3;
 		}
 	} else {
 		x = width / 2;
 		y = height / 2;
 		k = 1;
 		centered = null;
-		magnitude = "mesoregioes_mg";
+		magnitude = "mesomg";
 	}
 	sortElements();
 
@@ -145,9 +141,9 @@ function click(d, isCapital) {
 }
 
 function getMV(d) {
-	if ("mesoregioes_mg".indexOf(d) !== -1) {
+	if ("mesomg".indexOf(d) !== -1) {
 		return 3;
-	} else if ("municipios_metropolitana_bh".indexOf(d) !== -1) {
+	} else if ("munmg".indexOf(d) !== -1) {
 		return 2;
 	} else {
 		return 1;
@@ -191,10 +187,10 @@ function sortElements() {
 
 
 $(window).resize(function() {
-	magnitude = "mesoregioes_mg";
+	magnitude = "mesomg";
 	width = $("#geografico").width();
-	height = width / 1.2;
-	scale = width * 3.5;
+	height = width / 1.5;
+	scale = width * 3.3;
 	offset = [width / 2, height / 2];
 	projection = d3.geo.mercator()
 				.scale(scale)
