@@ -1,0 +1,14 @@
+	$isento = new Field();
+	$isento->name="ISENTO";
+	$isento->id="Isento";
+	$isento->label="";
+	$isento->type="select";
+	$isento->idcss="normalEdit";
+	$isento->value=$isento_v;
+	$isento->mask="";
+	$isento->maxlength="";
+	$isento->size="";
+	$isento->width="280";
+	$isento->options=getSelectFromBD_all("SELECT DISTINCT  crel_isento,sn_descricao FROM candidato_relatorio INNER JOIN alt_sn ON sn_letra = crel_isento ORDER BY sn_descricao");
+	$isento->mandatory=true;
+	$isento->enabled=true;
