@@ -1,4 +1,5 @@
 var magnitude = "mesomg";
+var selectedMeso = "";
 var center = [-44.31301959952854, -18.95937600486544];
 
 var width = $("#geografico").width(), height = width / 1.5, centered;
@@ -11,7 +12,7 @@ var svg = d3.select("#geografico").append("svg")
     .attr("width", width)
     .attr("height", height);
 
-svg.append("rect")
+var rect = svg.append("rect")
     .attr("class", "background")
     .attr("width", width)
     .attr("height", height)
@@ -40,15 +41,16 @@ function draw(){
 			.attr("nome", function(d) { return d.properties.nome; })
 	        
 	        .attr("Sigla", function(d) { return d.properties.sigla; })
-			.attr("Região", function(d) { return d.properties.regiao; })
-			.attr("Mesoregião", function(d) { return d.properties.nome_meso; })
-			.attr("População", function(d) { return d.properties.pop2010; })
+			.attr("Regiao", function(d) { return d.properties.regiao; })
+			.attr("Mesoregiao", function(d) { return d.properties.nome_meso; })
+			.attr("Populacao", function(d) { return d.properties.pop2010; })
 			.attr("d", path)
 			.on("click", function(d) {
 				if (d.tipo != "bairrobh") {
 					// MESO
 					if (d.tipo == "mesomg") {
 						magnitude = "munmg";
+						selectedMeso = d.properties.nome;
 						click(d, false);
 					// MUNICIPIOS
 					} else if (d.tipo == "munmg") {
@@ -65,7 +67,7 @@ function draw(){
 		
 			$("path").tipsy({
 				html : true,
-				gravity : 's',//$.fn.tipsy.autoNS,
+				gravity : $.fn.tipsy.autoNS,
 				offset: -1,
 				trigger : 'hover',
 				title : function() {
@@ -85,11 +87,19 @@ function draw(){
 				magnitude = this.id;
 				sortElements();
 			});
-	
+			
+			$(document).keydown(function(e) {
+				var code = e.keyCode ? e.keyCode : e.which;
+				if (code == 27) {
+					click();
+				}
+			});
+
 			sortElements(); 
 	
 	});
 	
+	/* Pontos de candidatos , ver se tem como associar com omysql php */
 	var projectionPoints = d3.geo.mercator().scale(scale).center(center).translate(offset);
 	var coords = projectionPoints([-43.95195, -19.91007]);
 	
@@ -121,6 +131,7 @@ function click(d, isCapital) {
 		k = 1;
 		centered = null;
 		magnitude = "mesomg";
+		selectedMeso = "";
 	}
 	sortElements();
 
@@ -138,6 +149,7 @@ function click(d, isCapital) {
 	points.selectAll("circle").transition().duration(1000)
 		.attr('r', 1.5 / k);
 
+	console.log(selectedMeso);
 }
 
 function getMV(d) {
@@ -163,12 +175,30 @@ function sortElements() {
 		// METROPOLITANA
 		} else if (getMV(magnitude) == 2) {
 			if (getMV(a.tipo) == 2) {
+				if(a.properties.nome_meso == selectedMeso) {
+					return 1;
+				} else {
+					return -1;
+				}				
+			} else if((getMV(a.tipo) == 3 && a.properties.nome != selectedMeso) || (getMV(b.tipo) == 3 && b.properties.nome != selectedMeso) ) {
 				return 1;
-			} else {
-				return -1;
+			} else if (getMV(b.tipo) == 2) {
+				if(b.properties.nome_meso == selectedMeso) {
+					return -1;
+				} else {
+					return 1;
+				}	
 			}
 		// BAIRRO POPULAR
 		} else {
+			if((getMV(a.tipo) == 3 && a.properties.nome != selectedMeso) || (getMV(b.tipo) == 3 && b.properties.nome != selectedMeso) ) {
+				return 1;
+			}
+			if(getMV(a.tipo) == 2 && a.properties.nome_meso != selectedMeso) {
+				return -1;
+			} else if (b.tipo == 2 && b.properties.nome_meso != selectedMeso) {
+				return 1;
+			}
 			if (getMV(a.tipo) == getMV(b.tipo) && getMV(a.tipo) != 1) {
 				return 0;
 			} else if (getMV(a.tipo) > getMV(b.tipo)) {
@@ -188,6 +218,7 @@ function sortElements() {
 
 $(window).resize(function() {
 	magnitude = "mesomg";
+	selectedMeso = "";
 	width = $("#geografico").width();
 	height = width / 1.5;
 	scale = width * 3.3;
