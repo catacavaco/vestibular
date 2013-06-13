@@ -2,7 +2,7 @@ var magnitude = "mesomg";
 var selectedMeso = "";
 var center = [-44.31301959952854, -18.95937600486544];
 
-var width = $("#geografico").width(), height = width / 1.5, centered;
+var width = $("#geografico").width(), height = width / 1.6, centered;
 var scale = width * 3.3;
 var offset = [width / 2, height / 2];
 var projection = d3.geo.mercator().scale(scale).center(center).translate(offset);
@@ -220,7 +220,7 @@ $(window).resize(function() {
 	magnitude = "mesomg";
 	selectedMeso = "";
 	width = $("#geografico").width();
-	height = width / 1.5;
+	height = width / 1.6;
 	scale = width * 3.3;
 	offset = [width / 2, height / 2];
 	projection = d3.geo.mercator()
