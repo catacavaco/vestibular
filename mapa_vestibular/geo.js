@@ -38,6 +38,15 @@ function draw(){
 				}
 			})
 			.attr("class", function(d) { return d.tipo; })
+			.attr("gid", function(d) {
+				if (d.tipo == "bairrobh") {
+					return d.properties.bid;
+				} else if (d.tipo == "munmg") {
+					return d.properties.idmun;
+				} else {
+					return d.properties.idmeso;
+				}
+			})
 			.attr("nome", function(d) { return d.properties.nome; })
 	        
 	        .attr("Sigla", function(d) { return d.properties.sigla; })
