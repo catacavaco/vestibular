@@ -1,0 +1,26 @@
+.background {
+	fill: none;
+	pointer-events: all;
+}
+
+#mg {
+	
+	stroke: #aaa;
+	stroke-width: 0.5px;
+}
+
+#mg .active {
+	fill: orange;
+}
+
+b {
+	font-weight: bolder;
+}
+
+.tipsy-inner {
+	text-align: left;
+}
+
+h2 {
+	padding : 10px;
+}

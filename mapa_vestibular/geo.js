@@ -1,6 +1,10 @@
+var center = [-44.31301959952854, -18.95937600486544];
+var color = d3.scale.linear()
+    .domain([.00,.20,.40])
+    .range(["#DEEBF7", "#9ECAE1", "#3182BD"]);
+
 var magnitude = "mesomg";
 var selectedMeso = "";
-var center = [-44.31301959952854, -18.95937600486544];
 
 var width = $("#geografico").width(), height = width / 1.6, centered;
 var scale = width * 3.3;
@@ -25,7 +29,7 @@ var points = svg.append("g")
     .attr("id", "candidatos");
     
 function draw(){
-	d3.json("minas.geojson", function(json) {
+	d3.json("minas2.geojson", function(json) {
 		
 		g.selectAll("path").remove();
 		
@@ -53,9 +57,15 @@ function draw(){
 			.attr("Regiao", function(d) { return d.properties.regiao; })
 			.attr("Mesoregiao", function(d) { return d.properties.nome_meso; })
 			.attr("Populacao", function(d) { return d.properties.pop2010; })
+			/* Parte que tem q entrar o PHP */
+			.style("fill", function(d) { return color(d.properties.candidatosaprovados/d.properties.candidatos); })
+			.attr("MediaProva", function(d) { return d.properties.mediaprova; })
+			.attr("IndiceDeAprovamento", function(d) { return ((d.properties.candidatosaprovados/d.properties.candidatos) * 100).toFixed(2) + "%"; })
+			.attr("Candidatos", function(d) { return d.properties.candidatos; })
+			.attr("CandidatosAprovados", function(d) { return d.properties.candidatosaprovados; })
+			/* Fim da parte */
 			.attr("d", path)
 			.on("click", function(d) {
-				if (d.tipo != "bairrobh") {
 					// MESO
 					if (d.tipo == "mesomg") {
 						magnitude = "munmg";
@@ -70,9 +80,23 @@ function draw(){
 							magnitude = "munmg";
 							click(d, false);
 						}
+					} else if (d.tipo == "bairrobh")  {
+						magnitude = "bairrobh";
+						click(d, true);
 					}
-				}
-			}); 
+			})
+			.on("mouseover", function(d) {      
+	            d3.select(this)
+					.transition()        
+	                .duration(200)      
+	                .style("opacity", .7);      
+	            })                  
+	        .on("mouseout", function(d) {       
+	            d3.select(this)
+	            	.transition()        
+	                .duration(500)      
+	                .style("opacity", 1);   
+	        }); 
 		
 			$("path").tipsy({
 				html : true,
@@ -158,7 +182,6 @@ function click(d, isCapital) {
 	points.selectAll("circle").transition().duration(1000)
 		.attr('r', 1.5 / k);
 
-	console.log(selectedMeso);
 }
 
 function getMV(d) {

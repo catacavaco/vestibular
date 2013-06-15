@@ -4,30 +4,13 @@
 }
 
 #mg {
-	fill: #aaa;
-	stroke: #fff;
+	
+	stroke: #aaa;
 	stroke-width: 0.5px;
 }
 
 #mg .active {
-	fill: #6699DD;
-}
-#capital {
-	fill: #6699aa;
-}
-
-.mesomg {
-	fill: #aacccc;
-}
-.munmg {
-	fill: #88aaaa;
-}
-.bairrobh {
-	fill: #6699aa
-}
-
-.bairrobh:hover, .munmg:hover, .mesomg:hover {
-	fill: #6699cc;
+	fill: orange;
 }
 
 b {
