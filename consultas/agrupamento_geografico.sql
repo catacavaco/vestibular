@@ -21,7 +21,8 @@ where c.crel_inscricao = a.crel_inscricao
 
 /* Agrupamentos */
 
-/* Media da prova por regiao */
+/* Media da prova por regiao
+	total integrado eh 60, total superior eh 100 ou 120 nao lembro */
 SELECT idmeso , sum(crel_notafinal)/count(*)
 FROM `candidato_relatorio`
 WHERE crel_processo = '20111_integrado'
