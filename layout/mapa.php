@@ -7,62 +7,34 @@
 	require_once("system_top_head.php");
 ?>
 	<link rel="stylesheet" type="text/css" href="tipsy/stylesheets/tipsy.css">
-	<link rel="stylesheet" type="text/css" href="geo.css">
+	<link rel="stylesheet" type="text/css" href="mapa.css">
 	
 	<div id="geografico">
-        <!--<input type="button" value="Meso-regiões" id="mesomg" />
-		<input type="button" value="Municípios região metropolitana de Belo Horizonte" id="munmg" />
-		<input type="button" value="Bairros de Belo Horizonte" id="bairrobh" />
-		<br/>-->
 		<h2>Mapa do vestibular</h2>
 		<br/>
       </div>
 	
 	<script type='text/javascript' src="jquery/jquery-1.9.1.js"></script>
 	<script type='text/javascript' src='tipsy/javascripts/jquery.tipsy.js'></script>
-    <script>
-    <?php
-    	$regiao = "meso";
-		$qr="SELECT id$regiao, count(*)
-		FROM `candidato_relatorio`
-		WHERE crel_processo = '20111_integrado'
-		AND idmeso <> \"\"
-		GROUP BY idmeso
-		order by count(*) desc;";
-		
-		$RES = mysql_query($qr) or die(mysql_error()); 
-		
-		$i=0;
-		while($row=mysql_fetch_array($RES)){
-		    $mesos[$i] = $row['id'.$regiao.''];
-		    $mesoat = $mesos[$i];
-		    $quantidade[$i] = $row[1];
-		   
-		    $qr2="SELECT avg(crel_notafinal) FROM candidato_relatorio WHERE id$regiao='$mesoat' AND crel_processo = '20111_integrado'";
-		    $RES2 = mysql_query($qr2) or die(mysql_error()); 
-		    $row2=mysql_fetch_array($RES2);
-		    $media[$i] = $row2[0];
-			
-			$qr3="SELECT count(*) FROM candidato_relatorio WHERE id$regiao='$mesoat' AND crel_processo = '20111_integrado' AND crel_sit_vestibular = 'C' ";
-		    $RES3 = mysql_query($qr3) or die(mysql_error()); 
-		    $row3=mysql_fetch_array($RES3);
-		    $candidatos_aprovados[$i] = $row3[0];
-		 
-		 
-		    $i++;
-		}
-		
-		echo 'var '.$regiao.'Array = [';
-		
-		for($i=0;$i<count($mesos);$i++){
-		   if($i!=0) echo ",\n\t\t\t\t";
-		   echo '{"id'.$regiao.'": "'.$mesos[$i].'","candidatos": '.$quantidade[$i].', "candidatos_aprovados": '.$candidatos_aprovados[$i].', "media": '.$media[$i].'}';
-		    
-		}
-		echo " ];\n";
-		?>
-		</script>
-		<script>
+    <?php require_once("mapa_functions.php"); 
+    	getDataArray("meso"); 
+		getDataArray("mun");
+		getDataArray("bairro");
+    	?>
+	<script>
+	function getValues(value,array) {
+		var result;
+		$.each(array, function(i, v) {
+	    if (v.id == value) {
+	        result =  v;
+	        return false;
+	    }
+		});
+		return result;
+	}
+	
+	</script>
+	<script>
     	var center = [-44.31301959952854, -18.95937600486544];
 		var color = d3.scale.linear()
 		    .domain([.00,.20,.40])
@@ -94,10 +66,25 @@
 		    .attr("id", "candidatos");
 		    
 		function draw(){
-			d3.json("minas.geojson", function(json) {
+			d3.json("mapa_minas.geojson", function(json) {
 				
+				json.features.forEach(function(d) {
+					var values;
+					if(d.tipo == "bairrobh") {
+						values = getValues(d.properties.bid,bairroArray);
+					} else if (d.tipo == "munmg") {
+						values = getValues(d.properties.idmun,munArray);
+					} else {
+						values = getValues(d.properties.idmeso,mesoArray);
+					}
+					if(values) {
+						d.properties["media_prova"] = values.media_prova;
+						d.properties["candidatos"] = values.candidatos;
+					    d.properties["candidatos_aprovados"] = values.candidatos_aprovados;
+					}
+				  });
+								
 				g.selectAll("path").remove();
-				
 				g.selectAll("path").data(json.features).enter().append("path")
 					.attr("id", function(d) {
 						if (d.properties.nome == 'Belo Horizonte') {
@@ -122,13 +109,11 @@
 					.attr("regiao", function(d) { return d.properties.regiao; })
 					.attr("mesoregiao", function(d) { return d.properties.nome_meso; })
 					.attr("populacao", function(d) { return d.properties.pop2010; })
-/* Parte que tem q entrar o PHP */
-					.style("fill", function(d) { return color(d.properties.candidatosaprovados/d.properties.candidatos); })
-					.attr("media_prova", function(d) { return d.properties.mediaprova; })
-					.attr("indice_aprovamento", function(d) { return ((d.properties.candidatosaprovados/d.properties.candidatos) * 100).toFixed(2) + "%"; })
+					.style("fill", function(d) { return color(d.properties.candidatos_aprovados/d.properties.candidatos); })
 					.attr("candidatos", function(d) { return d.properties.candidatos; })
-					.attr("candidatos_aprovados", function(d) { return d.properties.candidatosaprovados; })
-/* Fim da parte */
+					.attr("candidatos_aprovados", function(d) { return d.properties.candidatos_aprovados; })
+					.attr("indice_aprovacao", function(d) { return ((d.properties.candidatos_aprovados/d.properties.candidatos) * 100).toFixed(2) + "%"; })
+					.attr("media_prova", function(d) { return d.properties.media_prova; })
 					.attr("d", path)
 					.on("click", function(d) {
 							// MESO
@@ -205,13 +190,14 @@
 			
 /* Pontos de candidatos OUTRA PARTE QUE TEM Q ENTRAR O PHP */
 			var projectionPoints = d3.geo.mercator().scale(scale).center(center).translate(offset);
-			var coords = projectionPoints([-43.95195, -19.91007]);
-			
+			//Centro CEFET-MG-BH
+			var coords = projectionPoints([-43.97987, -19.93016]);
+				
 			points.append("circle")
 			.attr('cx', coords[0])
 			.attr('cy', coords[1])
 			.attr('r', 1.5)
-			.style('fill', 'red');
+			.style('fill', 'blue');
 /* PHP */
 		}
 		
