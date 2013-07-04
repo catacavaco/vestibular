@@ -8,9 +8,13 @@
 ?>
 	<link rel="stylesheet" type="text/css" href="tipsy/stylesheets/tipsy.css">
 	<link rel="stylesheet" type="text/css" href="mapa.css">
-	
 	<div id="geografico">
 		<h2>Mapa do vestibular</h2>
+		<div id="tiposCor">
+			<input type="radio" name="tipo" value="Candidatos Total" id="candidatos" checked/><div>Candidatos Total</div>
+			<input type="radio" name="tipo" value="Candidatos Aprovados" id="aprovados"/><div>Candidatos Aprovados</div>
+			<input type="radio" name="tipo" value="Índice de Aprovação" id="aprovacao"/><div>Índice de Aprovação</div>
+		</div>
 		<br/>
       </div>
 	
@@ -36,12 +40,9 @@
 	</script>
 	<script>
     	var center = [-44.31301959952854, -18.95937600486544];
-		var color = d3.scale.linear()
-		    .domain([.00,.20,.40])
-		    .range(["#DEEBF7", "#9ECAE1", "#3182BD"]);
-		
 		var magnitude = "mesomg";
 		var selectedMeso = "";
+		var tipo = "candidatos";
 		
 		var width = $("#geografico").width(), height = width / 1.6, centered;
 		var scale = width * 3.3;
@@ -67,6 +68,26 @@
 		    
 		function draw(){
 			d3.json("mapa_minas.geojson", function(json) {
+				
+				/* Cor */
+		    	var domain;
+		    	var legend_labels;
+				    
+				if(tipo == "aprovacao") {
+					domain  = [.00,.01,.50,1.0];
+		    		legend_labels = ["0%", "1%", "50%", "100%"];
+				} else if (tipo == "candidatos") {
+					domain  = [0,10,5000,10000];
+		    		legend_labels = ["Nenhum candidato", "10+ candidatos", "5000+ candidatos", "10000 candidatos"];
+				} else {
+					domain  = [0,1,200,600];
+		    		legend_labels = ["Nenhum candidato aprovado", "1+ candidato aprovado", "200+ candidatos aprovados", "600 candidatos aprovados"];
+				}
+				
+				var color = d3.scale.linear()
+				    .domain(domain)
+				    .range(["#EEF6FF", "#A0C3DE", "#497495", "#1d4e71"]);
+				/* End cor */
 				
 				json.features.forEach(function(d) {
 					var values;
@@ -109,7 +130,15 @@
 					.attr("regiao", function(d) { return d.properties.regiao; })
 					.attr("mesoregiao", function(d) { return d.properties.nome_meso; })
 					.attr("populacao", function(d) { return d.properties.pop2010; })
-					.style("fill", function(d) { return color(d.properties.candidatos_aprovados/d.properties.candidatos); })
+					.style("fill", function(d) { 
+							if(tipo == "aprovacao") {
+								return color(d.properties.candidatos_aprovados/d.properties.candidatos);
+							} else if (tipo == "candidatos") {
+								return color(d.properties.candidatos);
+							} else {
+								return color(d.properties.candidatos_aprovados);
+							}
+						})
 					.attr("candidatos", function(d) { return d.properties.candidatos; })
 					.attr("candidatos_aprovados", function(d) { return d.properties.candidatos_aprovados; })
 					.attr("indice_aprovacao", function(d) { return ((d.properties.candidatos_aprovados/d.properties.candidatos) * 100).toFixed(2) + "%"; })
@@ -186,19 +215,30 @@
 		
 					sortElements(); 
 			
+			//Legendas
+
+		  var legend = svg.selectAll("g.legend")
+		  .data(domain)
+		  .enter().append("g")
+		  .attr("class", "legend");
+		
+		  var ls_w = 20, ls_h = 20;
+		
+		  legend.append("rect")
+		  .attr("x", 20)
+		  .attr("y", function(d, i){ return height - (i*ls_h) - 2*ls_h;})
+		  .attr("width", ls_w)
+		  .attr("height", ls_h)
+		  .style("fill", function(d, i) { return color(d); })
+		  .style("opacity", 0.8);
+		
+		  legend.append("text")
+		  .attr("x", 50)
+		  .attr("y", function(d, i){ return height - (i*ls_h) - ls_h - 4;})
+		  .text(function(d, i){ return legend_labels[i]; });
+  
 			});
 			
-/* Pontos de candidatos OUTRA PARTE QUE TEM Q ENTRAR O PHP */
-			var projectionPoints = d3.geo.mercator().scale(scale).center(center).translate(offset);
-			//Centro CEFET-MG-BH
-			var coords = projectionPoints([-43.97987, -19.93016]);
-				
-			points.append("circle")
-			.attr('cx', coords[0])
-			.attr('cy', coords[1])
-			.attr('r', 1.5)
-			.style('fill', 'blue');
-/* PHP */
 		}
 		
 		draw();
@@ -307,6 +347,16 @@
 		
 		
 		$(window).resize(function() {
+			recreate();
+		});
+		
+		$("#aprovacao, #candidatos, #aprovados").click(function() {
+		   tipo = this.id;
+		   console.log(tipo);
+		   recreate();
+		});
+		
+		function recreate() {
 			magnitude = "mesomg";
 			selectedMeso = "";
 			width = $("#geografico").width();
@@ -333,7 +383,7 @@
 			g = svg.append("g").attr("id", "mg");
 			points = svg.append("g").attr("id", "candidatos");
 			draw();
-		});
+		}
 		
 		function ucFirstAllWords( str )	{
 		    var pieces = str.split(" ");
